@@ -10,5 +10,4 @@ class Clinica:
         self.hora_fechamento = hora_fechamento
 
     def atende_no_horario(self, hora_inicio: time, hora_fim: time) -> bool:
-        """Verifica se o horário passado está dentro do expediente da clínica."""
         return self.hora_abertura <= hora_inicio and hora_fim <= self.hora_fechamento
