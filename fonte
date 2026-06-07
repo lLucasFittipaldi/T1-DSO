@@ -1,0 +1,126 @@
+from abc import ABC
+from datetime import date, time
+from typing import List
+
+class Pessoa(ABC):
+    def __init__(self, nome: str, celular: str, cpf: str):
+        self.nome = nome
+        self.celular = celular
+        self.cpf = cpf
+
+class Paciente(Pessoa):
+    def __init__(self, nome: str, celular: str, cpf: str, data_nascimento: date):
+        super().__init__(nome, celular, cpf)
+        self.data_nascimento = data_nascimento
+
+    def is_maior_de_idade(self, data_referencia: date) -> bool:
+        """Calcula se o paciente tem 18 anos completos na data informada."""
+        idade = data_referencia.year - self.data_nascimento.year - \
+                ((data_referencia.month, data_referencia.day) < (self.data_nascimento.month, self.data_nascimento.day))
+        return idade >= 18
+
+class Profissional(Pessoa):
+    def __init__(self, nome: str, celular: str, cpf: str, especialidade: str, registro_profissional: str):
+        super().__init__(nome, celular, cpf)
+        self.especialidade = especialidade
+        self.registro_profissional = registro_profissional
+
+
+class Clinica:
+    def __init__(self, nome: str, cidade: str, descricao: str, hora_abertura: time, hora_fechamento: time):
+        self.nome = nome
+        self.cidade = cidade
+        self.descricao = descricao
+        self.hora_abertura = hora_abertura
+        self.hora_fechamento = hora_fechamento
+
+    def atende_no_horario(self, hora_inicio: time, hora_fim: time) -> bool:
+       # Verifica se o horário passado está dentro do expediente da clínica.
+        return self.hora_abertura <= hora_inicio and hora_fim <= self.hora_fechamento
+
+class TipoAtendimento:
+    def __init__(self, descricao: str):
+        self.descricao = descricao
+
+class Procedimento:
+    def __init__(self, descricao: str, custo: float, profissional_responsavel: Profissional):
+        self.descricao = descricao
+        self.custo = custo
+        self.profissional_responsavel = profissional_responsavel
+
+
+
+# PAGAMENTOS
+
+class Pagamento(ABC):
+    def __init__(self, data_pagamento: date, paciente: Paciente, valor_pago: float):
+        self.data_pagamento = data_pagamento
+        self.paciente = paciente
+        self.valor_pago = valor_pago
+
+class PagamentoDinheiro(Pagamento):
+    def __init__(self, data_pagamento: date, paciente: Paciente, valor_pago: float):
+        super().__init__(data_pagamento, paciente, valor_pago)
+
+class PagamentoPix(Pagamento):
+    def __init__(self, data_pagamento: date, paciente: Paciente, valor_pago: float, cpf_pagador: str):
+        super().__init__(data_pagamento, paciente, valor_pago)
+        self.cpf_pagador = cpf_pagador
+
+class PagamentoCartao(Pagamento):
+    def __init__(self, data_pagamento: date, paciente: Paciente, valor_pago: float, numero_cartao: str, bandeira: str):
+        super().__init__(data_pagamento, paciente, valor_pago)
+        self.numero_cartao = numero_cartao
+        self.bandeira = bandeira
+
+
+# ATENDIMENTO
+
+class Atendimento:
+    def __init__(self, clinica: Clinica, paciente: Paciente, profissional: Profissional, 
+                 data_atendimento: date, hora_inicio: time, hora_fim: time, 
+                 tipo: TipoAtendimento, valor_base: float):
+        
+        self.clinica = clinica
+        self.paciente = paciente
+        self.profissional = profissional
+        self.data_atendimento = data_atendimento
+        self.hora_inicio = hora_inicio
+        self.hora_fim = hora_fim
+        self.tipo = tipo
+        self.valor_base = valor_base
+        
+        self.procedimentos: List[Procedimento] = []
+        self.pagamentos: List[Pagamento] = []
+
+        # Valida as regras de negócio logo na criação do atendimento
+        self._validar_regras()
+
+    def _validar_regras(self):
+        # Somente pacientes com mais de 18 anos completos.
+        if not self.paciente.is_maior_de_idade(self.data_atendimento):
+            raise ValueError("O paciente deve ter mais de 18 anos para realizar o atendimento.")
+        
+        # Deve ocorrer dentro do período de funcionamento.
+        if not self.clinica.atende_no_horario(self.hora_inicio, self.hora_fim):
+            raise ValueError("O horário do atendimento está fora do período de funcionamento da clínica.")
+
+    def adicionar_procedimento(self, procedimento: Procedimento):
+        self.procedimentos.append(procedimento)
+
+    def registrar_pagamento(self, pagamento: Pagamento):
+        # Os pagamentos devem ser realizados até a data do atendimento.
+        if pagamento.data_pagamento > self.data_atendimento:
+            raise ValueError("A data de pagamento não pode ser posterior à data do atendimento.")
+        
+        self.pagamentos.append(pagamento)
+
+    def calcular_valor_total(self) -> float:
+        """Retorna a soma do valor base da consulta com os custos dos procedimentos."""
+        valor_procedimentos = sum(p.custo for p in self.procedimentos)
+        return self.valor_base + valor_procedimentos
+
+    def calcular_valor_restante(self) -> float:
+        """Subtrai o total já pago do valor total do atendimento."""
+        total_pago = sum(p.valor_pago for p in self.pagamentos)
+        return self.calcular_valor_total() - total_pago
