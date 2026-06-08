@@ -49,6 +49,7 @@ class TelaProfissional:
 
     def alterar(self):
         try:
+            # ao deixar a entrada em branco, envia None para o controlador, sinalizando que o valor deve ser mantido
             cpf = input("CPF do profissional a alterar: ").strip()
             print("Deixe em branco para manter o valor atual.")
             novo_nome = input("Novo nome: ").strip() or None

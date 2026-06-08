@@ -5,6 +5,7 @@ from model.pagamento import PagamentoDinheiro, PagamentoPix, PagamentoCartao
 class ControladorAtendimento:
     def __init__(self, controlador_sistema):
         self.__controlador_sistema = controlador_sistema
+        # Cria uma lista vazia para armazenar os atendimentos e um contador para o próximo ID
         self.__atendimentos = []
         self.__proximo_id = 1
 
@@ -52,7 +53,7 @@ class ControladorAtendimento:
 
         atendimento = Atendimento(clinica, paciente, profissional, data_atendimento, 
                                   hora_inicio, hora_fim, tipo, valor)
-        
+        # Atribui o ID atual ao novo atendimento e logo em seguida soma +1 para o próximo atendimento
         atendimento.id = self.__proximo_id
         self.__proximo_id += 1
         self.__atendimentos.append(atendimento)
@@ -95,9 +96,11 @@ class ControladorAtendimento:
         atendimento._validar_regras()
 
     def buscar(self, id_atendimento: int) -> Atendimento:
+        # percorre a lista de atendimentos um por um
         for a in self.__atendimentos:
             if a.id == id_atendimento:
-                return a
+                return a # retorna  o objeto assim que encontra, parando a busca
+            # se chegar ao final da lista sem encontrar, lança um erro
         raise ValueError("Atendimento não encontrado.")
 
     def listar(self):

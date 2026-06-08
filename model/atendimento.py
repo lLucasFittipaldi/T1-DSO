@@ -54,11 +54,11 @@ class Atendimento:
         self.pagamentos.append(pagamento)
 
     def calcular_valor_total(self) -> float:
-        """Retorna a soma do valor base da consulta com os custos dos procedimentos."""
+       # Retorna a soma do valor base da consulta com os custos dos procedimentos
         valor_procedimentos = sum(p.custo for p in self.procedimentos)
         return self.valor_base + valor_procedimentos
 
     def calcular_valor_restante(self) -> float:
-        """Subtrai o total já pago do valor total do atendimento."""
+       # Subtrai o total já pago do valor total do atendimento
         total_pago = sum(p.valor_pago for p in self.pagamentos)
         return self.calcular_valor_total() - total_pago

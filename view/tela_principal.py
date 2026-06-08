@@ -25,7 +25,7 @@ class TelaPrincipal:
             print("4. Tipos de atendimento")
             print("5. Atendimentos")
             print("0. Sair")
-            opcao = input("Escolha uma opção: ").strip()
+            opcao = input("Escolha uma opção: ").strip() # strip() para remover espaços em branco acidentais
             
             if opcao == "1":
                 self.__tela_clinica.mostrar_menu()
