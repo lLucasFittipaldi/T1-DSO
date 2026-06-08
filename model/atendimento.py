@@ -8,7 +8,7 @@ class TipoAtendimento:
     def __init__(self, descricao: str):
         self.descricao = descricao
 
-class Procedimento:
+class Procedimento: 
     def __init__(self, descricao: str, custo: float, profissional_responsavel: Profissional):
         self.descricao = descricao
         self.custo = custo
@@ -19,16 +19,16 @@ class Atendimento:
                  data_atendimento: date, hora_inicio: time, hora_fim: time, 
                  tipo: TipoAtendimento, valor_base: float):
         self.id = None
-        self.clinica = clinica
+        self.clinica = clinica # clinica, paciente e profissional = agregação, existem de forma independente
         self.paciente = paciente
         self.profissional = profissional
         self.data_atendimento = data_atendimento
         self.hora_inicio = hora_inicio
         self.hora_fim = hora_fim
-        self.tipo = tipo
+        self.tipo = tipo # tipo atendimento = associação 
         self.valor_base = valor_base
         
-        self.procedimentos: List[Procedimento] = []
+        self.procedimentos: List[Procedimento] = [] # procedimentos e pagamentos = composição, só existem dentro de um  atendimento
         self.pagamentos: List[Pagamento] = []
 
         # Valida as regras

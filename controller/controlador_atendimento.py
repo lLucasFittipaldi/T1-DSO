@@ -136,7 +136,7 @@ class ControladorAtendimento:
                                     valor_pago, numero_cartao, bandeira)
         atendimento.registrar_pagamento(pagamento)
 
-    # ---------- Relatórios ----------
+      # Relatórios ->  esqueci de colocar no menu de atendimento.
 
     def relatorio_clinicas_mais_atendimentos(self):
         if not self.__atendimentos:
